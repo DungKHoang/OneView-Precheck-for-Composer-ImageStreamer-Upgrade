@@ -1,4 +1,4 @@
-# Pre-check fro upgrade
+# Pre-check for upgrade
 
 The script runs pre-check operations before OneView upgrade to 4.20
 
