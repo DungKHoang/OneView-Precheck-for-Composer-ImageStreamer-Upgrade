@@ -11,6 +11,12 @@ if (-not ($hostname))
     $hostname   = read-host "Please provide the FQDN name or IP address of OneView"
 }
 
+write-host -foreground CYAN  '#################################################'
+write-host -foreground CYAN  "Connecting to OneView ... $hostname"
+write-host -foreground CYAN  '##################################################'
+Connect-HPOVMgmt -hostname $hostname -Credential $cred
+
+
 write-host -foreground CYAN '1#  save the Appliance support dump to C:'
 New-HPOVSupportDump -location  C: -type appliance
 
