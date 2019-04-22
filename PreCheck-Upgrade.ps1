@@ -45,11 +45,11 @@ write-host '3# check composer health active/standy cluster'
 Get-HPOVComposerNode | select ApplianceConnection,modelNumber,Name,Role,state,status
 
 write-host -foreground CYAN '4# check appliance web server certificate expiration'
-Get-HPOVApplianceCertificateStatus | select  ApplianceConnection,validUntil
+Get-HPOVApplianceCertificateStatus 
 
 write-host -foreground CYAN '5# Confirm no critical alerts on the uplinks or logical Enclosure or interconnect modules'
 'Enclosure','InterconnectBay','Network'| % { get-hpovalert -Timespan (New-TimeSpan -Days 2) -HealthCategory $_   | where Severity -eq 'Critical' }
 
 
 write-host  -foreground CYAN '6# Check all interconnect modules are in a configured state'
-Get-HPOVInterconnect | select name, state
+Get-HPOVInterconnect | format-table -auto name, state
