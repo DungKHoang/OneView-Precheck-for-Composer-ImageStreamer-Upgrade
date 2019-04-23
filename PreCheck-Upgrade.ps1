@@ -71,5 +71,37 @@ else
   write-host -foreground YELLOW "Local login is NOT allowed"  
 }
 
+$connectionName   = $hostname
+write-host  -foreground CYAN '7# Check LACP state for Image Streamer ports '
+$listofLIs         = Get-HPOVLogicalInterconnect -ApplianceConnection $connectionName
+foreach ($LI in $listofLIs)
+{
+    $LIname             = $LI.name
+    $IClist             = $LI.interconnects | % { send-hpovrequest -uri $_ -hostname $connectionName}  
+    foreach ($IC in $IClist)
+    {
+        
+        $portList       = $IC.ports |  where {($_.porttype -eq 'Uplink')  -and (-not ([string]::IsNullorEmpty($_.associatedUplinkSetUri) )) }
+        foreach ($port in $portList)
+        {
+            $uplsetName         = (Send-HPOVRequest -uri $port.associatedUplinkSetUri -hostname $connectionName).name
+            if ($uplsetName -eq 'Image Streamer')
+            {
+              $portName           = $port.interconnectName + "," + $port.name
+              $portStatus         = $port.portStatus + " " + $port.portStatusReason
+
+              $portLAGstate       = ""
+              if ($port.neighbor -ne $NULL )
+              {
+                  $portLAGstate   = "LACP Activity" 
+              }
+              write-host "$uplsetName,$portName,$portStatus,$portLAGstate"
+            }
+
+        }
+    }  
+
+
+}
 
 Disconnect-HPOVMgmt
