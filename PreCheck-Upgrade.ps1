@@ -20,7 +20,7 @@ if (-not ($hostname))
 write-host -foreground CYAN  '#################################################'
 write-host -foreground CYAN  "Connecting to OneView ... $hostname"
 write-host -foreground CYAN  '##################################################'
-Connect-HPOVMgmt -hostname $hostname -Credential $cred
+$a = Connect-HPOVMgmt -hostname $hostname -Credential $cred
 
 if ($CreateBackupSupport)
 {
@@ -53,6 +53,7 @@ Get-HPOVComposerNode | select ApplianceConnection,modelNumber,Name,Role,state,st
 
 write-host -foreground CYAN '4# check appliance web server certificate expiration'
 Get-HPOVApplianceCertificateStatus 
+sleep -Seconds 5
 
 write-host -foreground CYAN '5# Confirm no critical alerts on the uplinks or logical Enclosure or interconnect modules'
 'Enclosure','InterconnectBay','Network'| % { get-hpovalert -Timespan (New-TimeSpan -Days 2) -HealthCategory $_   | where Severity -eq 'Critical' }
@@ -64,15 +65,40 @@ Get-HPOVInterconnect | format-table -auto name, state
 write-host  -foreground CYAN '7# Check local login'
 if ( (Get-HPOVLdap).allowLocalLogin )
 {
-  write-host -foreground CYAN "Local login is allowed"
+  write-host "Local login is allowed"
 }
 else 
 {
   write-host -foreground YELLOW "Local login is NOT allowed"  
 }
 
+write-host  -foreground CYAN '8# Check service access'
+$enabled    = Send-HPOVRequest -uri /rest/appliance/settings/serviceaccess
+
+if ( $enabled )
+{
+  write-host  "service access is enabled"
+}
+else 
+{
+  write-host -foreground YELLOW "service access is NOT enabled"
+}
+
+write-host  -foreground CYAN '9# Check SSH access'
+$enabled    = Send-HPOVRequest -uri /rest/appliance/ssh-access
+
+if ( $enabled )
+{
+  write-host  "SSH access is enabled"
+}
+else 
+{
+  write-host -foreground YELLOW "SSH is NOT enabled"
+}
+
+
 $connectionName   = $hostname
-write-host  -foreground CYAN '7# Check LACP state for Image Streamer ports '
+write-host  -foreground CYAN '10# Check LACP state for Image Streamer ports '
 $listofLIs         = Get-HPOVLogicalInterconnect -ApplianceConnection $connectionName
 foreach ($LI in $listofLIs)
 {
