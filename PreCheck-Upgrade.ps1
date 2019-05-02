@@ -1,7 +1,9 @@
 Param (
-  $credential , 
-  $hostname,
-  [Boolean]$CreateBackupSupport)
+    $credential , 
+    $hostname, 
+    $AuthLoginDomain = "local", 
+    $OneViewModule      = "HPOneView.410",
+    [Boolean]$CreateBackupSupport)
 
 
 
@@ -20,7 +22,7 @@ if (-not ($hostname))
 write-host -foreground CYAN  '#################################################'
 write-host -foreground CYAN  "Connecting to OneView ... $hostname"
 write-host -foreground CYAN  '##################################################'
-$a = Connect-HPOVMgmt -hostname $hostname -Credential $cred
+$a = Connect-HPOVMgmt -hostname $hostname -Credential $cred -AuthLoginDomain $AuthLoginDomain
 
 if ($CreateBackupSupport)
 {

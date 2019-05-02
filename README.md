@@ -8,7 +8,7 @@ It can create support dump and backup file during the pre-check operations
 The script requires:
    * the latest OneView PowerShell library : https://github.com/HewlettPackard/POSH-HPOneView/releases
 
-
+The script must be run with administrator privilege
 
 
 ## Syntax
@@ -18,7 +18,8 @@ The script requires:
     .\precheck-upgrade.ps1  -hostname  <FQDN-OneView> -credential $cred 
    
    # To create support dump and backup file during the precheck operations, use the follwoing command:
-   .\precheck-upgrade.ps1  -hostname  <FQDN-OneView> -credential $cred -createBackupSupport
+   # Specify OneView host name and Login Domain ( default is "local" )
+   .\precheck-upgrade.ps1  -hostname  <FQDN-OneView> -credential $cred -AuthLoginDomain <AD-domain> -createBackupSupport
 
 ```
 
